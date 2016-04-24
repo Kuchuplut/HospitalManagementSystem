@@ -1,0 +1,258 @@
+@extends('maintenance')
+@section('article')
+<article class="white main z-depth-1">
+	<div class="row indigo darken-2" style="margin-left: -30px; border-top-right-radius: 10px;">
+				<div class="col s6">
+					<h4 class="thin white-text">Patient</h4>
+					@if(count($errors) > 0)
+						@foreach($errors->all() as $error)
+						<li>{!! $error !!}</li>
+						@endforeach
+					@endif
+				</div>
+				<div class="col s6 right">
+					<a href="#prescription" class="right btn modal-trigger btn-floating btn-large green darken-2" style="position: relative; top: 40px; right: 1%;">
+					<i class="material-icons">receipt</i></a>
+					<a href="#addDiagnosis" class="right btn modal-trigger btn-floating btn-large yellow darken-2" style="position: relative; top: 40px; right: 2%;">
+					<i class="material-icons">find_in_page</i></a>
+					<a href="#requestTest" class=" right btn modal-trigger btn-floating btn-large red darken-2" style="position: relative; top: 40px; right: 3%;">
+					<i class="material-icons">assignment_turned_in</i></a>
+					<div class="fixed-action-btn vertical" style="bottom: 45px; right: 24px;">
+					    <a class="btn-floating btn-large purple">
+					      <i class="large material-icons">print</i>
+					    </a>
+					    <ul>
+					      <li><a class="btn-floating red"><i class="material-icons">insert_chart</i></a></li>
+					      <li><a class="btn-floating yellow darken-1"><i class="material-icons">format_quote</i></a></li>
+					    </ul>
+					  </div>
+				</div>
+	</div>	
+		<div class="row">
+					<div class="col s3 center ">
+						 <img name="image" id="employeeimg" class="circle center" align="middle" style="width: 200px; height: 200px;" src="{!! asset($patient->txtPatientImgPath != null ? $patient->txtPatientImgPath : 'img/no_image.png') !!}" alt=""/>
+					</div>
+
+					<div class="col s3">
+						<h5>Name: <span class="thin">{!! $patient->strLastName . ', ' . $patient->strFirstName . ($patient->strMiddleName != null ? (' ' . $patient->strMiddleName) : '') !!}</span></h5>
+						<h5>Last Visit: <span class="thin">{!! $lastVisit ? date('F d, Y', strtotime($lastVisit->created_at)) : 'None' !!}</span></h5>
+						<h5>Address: <span class="thin">{!! $patient->txtAddress !!}</span></h5>
+					</div>
+
+					<div class="col s3">
+						<h5>Confined at: <span class="thin">{!! $patient->intRoomId ? "Room " . $patient->intRoomId . "(Bed " . $patient->intBedId . ")" : 'None' !!}</span></h5>
+						<h5>Unsettled Balance: <span class="thin">Php 500,000.00</span></h5>
+					</div>
+				</div>
+
+				<div class="row">
+					<h5 class="thin">Medical Record</h5>
+				</div>
+					<div class="divider"></div>
+				<div class="row container">
+					<p class="flow-text">
+						Lucy has become depressed and withdrawn since finding out that she has a brain tumour. In particular, she is very anxious about the possibility that the biopsy results will show that the tumour is cancerous. Although symptoms of depression and anxiety are not uncommon in patients threatened by a diagnosis of cancer, Lucy has a history of feeling melancholy and, significantly, developed postnatal depression following the birth of her son five years ago. Lucy's response to her current illness needs to be understood in this context, as it will help to assess how well she will cope with the forthcoming diagnosis and future management of her illness.
+					</p>
+				</div>
+
+				<div class="row">
+					<h5 class="thin">Examinations</h5>
+				</div>
+					<div class="divider"></div>
+					<br>
+				<div class="row container">
+					<table id="test" class="display" cellspacing="0" width="100%">
+					        <thead>
+					            <tr>
+					                <th>Test Code</th>
+					                <th>Test Name</th>
+					                <th>Test Description</th>
+					                <th>Status</th>
+					                <th>Actions</th>
+					            </tr>
+					        </thead>
+					        	
+					    </table>
+				</div>
+
+				<script type="text/javascript">
+					$(document).ready(function() {
+					    $('#test').DataTable( {
+					        dom: 'Bfrtip',
+					        buttons: [
+					            'copyHtml5',
+					            'excelHtml5',
+					            'csvHtml5',
+					            'pdfHtml5'
+					        ]
+					    });
+					});
+				</script>
+
+				<div class="row">
+					<h5 class="thin">Expenses</h5>
+				</div>
+					<div class="divider"></div>
+					<br>
+				<div class="row container">
+					<table id="fee" class="display" cellspacing="0" width="100%">
+					        <thead>
+					            <tr>
+					                <th>Fee Code</th>
+					                <th>Fee Name</th>
+					                <th>Fee Description</th>
+					                <th>Price</th>
+					                <th>Status</th>
+					                <th>Actions</th>
+					            </tr>
+					        </thead>
+					        	
+					    </table>
+
+					    <h5 class="thin right">Summary: <span class="green-text text-darken-2">Php 500,000.00</span> </h5>
+				</div>
+
+				<script type="text/javascript">
+					$(document).ready(function() {
+					    $('#fee').DataTable( {
+					        dom: 'Bfrtip',
+					        buttons: [
+					            'copyHtml5',
+					            'excelHtml5',
+					            'csvHtml5',
+					            'pdfHtml5'
+					        ]
+					    });
+					});
+				</script>
+		<!-- Request Test Modal -->
+	   <div id="requestTest" class="modal modal-fixed-footer">
+	    <form class="col s12 form" method="post" id="createEmpForm" action="{!! url('examination-request') !!}" enctype="multipart/form-data">
+	    	<input type="hidden" name="_token" value="{!! csrf_token() !!}" />
+	    	<input type="hidden" name="patientId" value="{!! $patient->intPatientId !!}" />
+	      <div class="modal-content" style="padding-bottom: 0px !important;">
+	        <!-- <div class="container"> -->
+		      <div class="wrapper">
+		      	<h4 class="thin indigo-text text-darken-2">Request for Examination</h4>
+		      	<h6>Patient Name: {!! $patient->strLastName . ', ' . $patient->strFirstName . ($patient->strMiddleName != null ? (' ' . $patient->strMiddleName) : '') !!}</h6>
+		      	<div class="input-field col s12">
+		      	    <select multiple name="service[]" required>
+		      	      <option value="" disabled selected>Choose your option</option>
+		      	      @foreach($services as $service)
+		      	      <option value="{!! $service->intServiceId !!}">{!! $service->strServiceName !!}</option>
+		      	      @endforeach
+		      	    </select>
+		      	    <label>Available Examinations</label>
+		      	 </div>
+
+		      	 <div class="input-field col s6">
+      	           <i class="material-icons prefix">mode_edit</i>
+      	           <textarea id="remarks" class="materialize-textarea" name="remarks"></textarea>
+      	           <label for="remarks">Remarks</label>
+      	         </div>
+
+      	         <p class="text-flow">
+      	         	Note: Requests are directly sent to the laboratory department
+      	         </p>
+		      </div>
+	      </div>
+	      <div class="modal-footer">
+	          <button type="reset" value="Reset" class=" modal-action modal-close waves-effect waves-purple transparent btn-flat">CANCEL</button>
+	          <button class="waves-effect waves-light indigo darken-3 white-text btn-flat" type="submit" value="Submit">SEND REQUEST</button>
+	      </div>
+	      </form>
+		</div>
+
+		<!-- Add Diagnosis Modal -->
+		<div id="addDiagnosis" class="modal modal-fixed-footer" style="width: 1300px !important;">
+	    <form class="col s12 form" method="post" id="createEmpForm" action="createEmployee" enctype="multipart/form-data">
+	      <div class="modal-content" style="padding-bottom: 0px !important;">
+	        <!-- <div class="container"> -->
+		      <div class="wrapper">
+		      	<h4 class="thin indigo-text text-darken-2">Add Diagnosis</h4>
+		      	<h6>Patient Name: {!! $patient->strLastName . ', ' . $patient->strFirstName . ($patient->strMiddleName != null ? (' ' . $patient->strMiddleName) : '') !!}</h6>
+		      	<div class="aside aside1">
+		      		<h6 class="thin">Examinations Made</h6>
+			      	<table>
+			      		<thead>
+			      			<td>Exams</td>
+			      			<td>Result</td>
+			      		</thead>
+
+			      		<tbody>
+			      			<tr>
+			      				<td>Urinalysis</td>
+			      				<td>Red Urine</td>
+			      			</tr>
+			      		</tbody>
+			      	</table>
+		      	</div>
+		      	
+		      	<div class="aside aside2">
+		      	<h6 class="thin">Doctor's Diagnosis</h6>
+			      	 <div class="input-field col s6">
+	      	           <i class="material-icons prefix">mode_edit</i>
+	      	           <textarea id="remarks" class="materialize-textarea"></textarea>
+	      	           <label for="remarks">Diagnosis</label>
+	      	         </div>
+
+	      	         <p class="text-flow">
+	      	         	Note: Results are directly received from the laboratory department
+	      	         </p>
+		      	</div>
+		      </div>
+	      </div>
+	      <div class="modal-footer">
+	          <button type="reset" value="Reset" class=" modal-action modal-close waves-effect waves-purple transparent btn-flat">CANCEL</button>
+	          <button class="waves-effect waves-light indigo darken-3 white-text btn-flat" type="submit" value="Submit">SEND REQUEST</button>
+	      </div>
+	      </form>
+		</div>
+
+		<!-- Add Prescription Modal -->
+		<div id="prescription" class="modal modal-fixed-footer" style="width: 800px !important;">
+	    <form class="col s12 form" method="post" id="createEmpForm" action="{!! url('prescription') !!}" enctype="multipart/form-data">
+			<input type="hidden" name="_token" value="{!! csrf_token() !!}" />
+	    	<input type="hidden" name="patientId" value="{!! $patient->intPatientId !!}" />
+
+	      <div class="modal-content" style="padding-bottom: 0px !important;">
+	        <!-- <div class="container"> -->
+		     <div class="wrapper">
+		      	<h4 class="thin indigo-text text-darken-2">Prescription</h4>
+		      	<h6>Patient Name: {!! $patient->strLastName . ', ' . $patient->strFirstName . ($patient->strMiddleName != null ? (' ' . $patient->strMiddleName) : '') !!}</h6>
+		      	<div class="row">
+					<h6>Medicine</h6>
+ 			 		
+ 			 		 <div class="input-field col s12">
+ 			 		    <select class="browser-default" id="buildingCreateSelect" name="medicineSelect" required>
+ 			 		        <option disabled selected>Choose Medicine</option>
+ 			 		        @foreach($items as $item)
+ 			 		        <option value="{!! $item->intItemId !!}">{!! $item->strItemName !!}</option>
+ 			 		        @endforeach
+ 			 		    </select>
+ 			 		    <label for="slct1" class="active">Medicine<span class="red-text">*</span></label>
+ 			 		</div>
+
+ 					<div class="input-field col s6">
+ 						 <input type="number" name="timesDayInput" class="validate" id="medQuantity">
+ 						 <label for="medQuantity">Times/day</label>
+ 					</div>
+
+ 					<div class="input-field col s6">
+ 						 <input type="number" name="intervalInput" class="validate" id="time" placeholder="minutes">
+ 						 <label for="time">Interval</label>
+ 					</div>
+		      </div>
+	      </div>	
+	      </div>
+	      <div class="modal-footer">
+	          <button type="reset" value="Reset" class=" modal-action modal-close waves-effect waves-purple transparent btn-flat">CANCEL</button>
+	          <button class="waves-effect waves-light indigo darken-3 white-text btn-flat" type="submit" value="Submit">SEND REQUEST</button>
+	      </div>
+	      </form>
+		</div>
+
+		
+</article>
+@endsection
+ 
